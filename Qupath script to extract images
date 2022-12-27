@@ -1,0 +1,17 @@
+def server = getCurrentServer()
+
+def imageData = getCurrentImageData()
+def name = GeneralTools.getNameWithoutExtension(imageData.getServer().getMetadata().getName())
+def pathOutput = buildFilePath(PROJECT_BASE_DIR, 'export', name)
+mkdirs(pathOutput)
+
+// Cycle through all existing annotations and export one original image per object
+annotations = getAnnotationObjects()
+annotations.eachWithIndex{a,i->
+def outputPath = buildFilePath    (pathOutput, 'original '+annotation+ i + '.png')
+def roi = a.getROI()
+def requestROI = RegionRequest.createInstance(server.getPath(), 1, roi)
+writeImageRegion(server, requestROI,outputPath)
+
+}
+
